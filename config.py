@@ -3,8 +3,12 @@ Configuration settings for JioMart Coupon Testing Script
 """
 
 class Config:
-    # Base coupon pattern to generate variations from
-    BASE_PATTERN = "881a0eb9570ae493b60b39e71eeaa03a"
+    # Base coupon patterns to generate variations from
+    BASE_PATTERNS = [
+        "881a0eb9570ae493b60b39e71eeaa03a",
+        "dde61d114db1f0aa2789816f7938f519"
+    ]
+    BASE_PATTERN = BASE_PATTERNS[0]  # For backward compatibility
     
     # JioMart URL configuration
     JIOMART_BASE_URL = "https://relianceretail.com/JioMart/"

@@ -157,8 +157,10 @@ class JioMartCouponTester:
     def run_multithreaded(self):
         """Main execution loop with multi-threading"""
         print("Starting JioMart Coupon Testing Script - MULTI-THREADED")
-        print(f"Base pattern: {Config.BASE_PATTERN}")
-        print("Generating random coupon variations...")
+        print("Base patterns:")
+        for i, pattern in enumerate(Config.BASE_PATTERNS, 1):
+            print(f"  Pattern {i}: {pattern}")
+        print("Generating random coupon variations based on both patterns...")
         
         # Show pattern info
         pattern_info = self.coupon_generator.get_pattern_info()

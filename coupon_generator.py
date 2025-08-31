@@ -11,7 +11,8 @@ from config import Config
 
 class CouponGenerator:
     def __init__(self):
-        self.base_pattern = Config.BASE_PATTERN
+        self.base_patterns = Config.BASE_PATTERNS
+        self.base_pattern = Config.BASE_PATTERN  # For backward compatibility
         self.positions = self._identify_changeable_positions()
         self.generated_coupons = []
         self.visited_file = "visited.txt"
@@ -113,23 +114,54 @@ class CouponGenerator:
         return digits, letters
     
     def _generate_systematic_coupon(self):
-        """Generate coupon with same character/digit count but random placement"""
-        # Count digits and letters in original pattern "881a0eb9570ae493b60b39e71eeaa03a"
-        original_digits = sum(1 for c in self.base_pattern if c.isdigit())  # 16 digits
-        original_letters = sum(1 for c in self.base_pattern if c.islower())  # 16 letters
+        """Generate coupon based on analyzing both pattern structures"""
+        # Choose random pattern to base structure on
+        selected_pattern = random.choice(self.base_patterns)
         
-        # Generate random digits and letters
-        random_digits = [random.choice(string.digits) for _ in range(original_digits)]
-        random_letters = [random.choice(string.ascii_lowercase) for _ in range(original_letters)]
+        # Analyze the selected pattern
+        pattern_info = self._analyze_pattern_structure(selected_pattern)
         
-        # Create all characters list
-        all_chars = random_digits + random_letters
+        # Generate coupon based on pattern structure
+        return self._generate_coupon_from_structure(pattern_info)
+    
+    def _analyze_pattern_structure(self, pattern):
+        """Analyze a pattern to understand its structure"""
+        structure = []
+        digit_count = 0
+        letter_count = 0
         
-        # Shuffle to randomize placement
-        random.shuffle(all_chars)
+        for i, char in enumerate(pattern):
+            if char.isdigit():
+                structure.append('digit')
+                digit_count += 1
+            elif char.islower():
+                structure.append('letter')
+                letter_count += 1
+            else:
+                structure.append('other')
         
-        # Join to create 32-character coupon
-        return ''.join(all_chars)
+        return {
+            'pattern': pattern,
+            'structure': structure,
+            'digit_count': digit_count,
+            'letter_count': letter_count,
+            'length': len(pattern)
+        }
+    
+    def _generate_coupon_from_structure(self, pattern_info):
+        """Generate a random coupon following the pattern structure"""
+        coupon_chars = []
+        
+        for char_type in pattern_info['structure']:
+            if char_type == 'digit':
+                coupon_chars.append(random.choice(string.digits))
+            elif char_type == 'letter':
+                coupon_chars.append(random.choice(string.ascii_lowercase))
+            else:
+                # For any other characters, use the original
+                coupon_chars.append('x')  # placeholder, shouldn't happen with our patterns
+        
+        return ''.join(coupon_chars)
     
     
     def get_generated_count(self):
