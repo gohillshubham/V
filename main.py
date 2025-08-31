@@ -16,7 +16,7 @@ from browser_manager import BrowserManager
 from config import Config
 
 class JioMartCouponTester:
-    def __init__(self, max_threads=20):  # Optimized for system resources
+    def __init__(self, max_threads=5):  # Conservative for browser stability
         self.coupon_generator = CouponGenerator()
         self.running = True
         self.tested_coupons = []
@@ -48,8 +48,24 @@ class JioMartCouponTester:
             # Construct JioMart URL with coupon parameter
             url = f"{Config.JIOMART_BASE_URL}?jiocpn={coupon_code}"
             
-            # Open browser and navigate to URL
-            browser_manager.open_browser()
+            # Try to open browser with retries
+            browser_opened = False
+            for attempt in range(3):
+                try:
+                    if browser_manager.open_browser():
+                        browser_opened = True
+                        break
+                    else:
+                        time.sleep(1)  # Wait between retries
+                except Exception as e:
+                    if attempt == 2:  # Last attempt
+                        raise e
+                    time.sleep(2)  # Longer wait on error
+            
+            if not browser_opened:
+                raise Exception("Failed to open browser after 3 attempts")
+            
+            # Navigate to URL
             browser_manager.navigate_to_url(url)
             
             # Wait a moment for page to fully load
@@ -237,8 +253,8 @@ def main():
     print("JioMart Coupon Testing Script v2.0 - MULTI-THREADED")
     print("=" * 60)
     
-    # Create tester with optimized thread count for stability and speed
-    tester = JioMartCouponTester(max_threads=20)
+    # Create tester with conservative thread count for browser stability  
+    tester = JioMartCouponTester(max_threads=5)
     tester.run_multithreaded()
 
 if __name__ == "__main__":
