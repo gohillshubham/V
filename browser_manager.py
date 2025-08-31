@@ -43,14 +43,23 @@ class BrowserManager:
         return options
     
     def _setup_firefox_service(self):
-        """Setup Firefox service with GeckoDriver"""
+        """Setup Firefox service with GeckoDriver - use system driver to avoid rate limits"""
         try:
-            # Use webdriver-manager to automatically download and manage GeckoDriver
-            service = Service(GeckoDriverManager().install())
-            return service
+            # Use system geckodriver directly to avoid GitHub rate limits
+            system_geckodriver = "/nix/store/w2y9xl7bnq7b8fhkp0yihmlv3438p4mh-geckodriver-0.36.0/bin/geckodriver"
+            
+            # Check if system driver exists
+            if os.path.exists(system_geckodriver):
+                service = Service(system_geckodriver)
+                return service
+            else:
+                # Fallback to default system PATH geckodriver
+                service = Service()  # Use system geckodriver from PATH
+                return service
+                
         except Exception as e:
             print(f"Error setting up GeckoDriver service: {e}")
-            print("Please ensure Firefox browser is installed or webdriver-manager can download GeckoDriver")
+            print("Please ensure Firefox browser is installed")
             raise
     
     def open_browser(self):

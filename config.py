@@ -14,7 +14,7 @@ class Config:
     PAGE_LOAD_TIMEOUT = 10  # seconds to wait for page load
     
     # Browser configuration
-    HEADLESS_MODE = False  # Set to True to run browser in headless mode
+    HEADLESS_MODE = True  # Set to True to run browser in headless mode
     
     # Performance settings
     MAX_RETRIES = 3  # Maximum retries for failed operations
