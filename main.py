@@ -61,6 +61,13 @@ class JioMartCouponTester:
         """Main execution loop"""
         print("Starting JioMart Coupon Testing Script")
         print(f"Base pattern: {Config.BASE_PATTERN}")
+        print("Generating random coupon variations...")
+        
+        # Show pattern info
+        pattern_info = self.coupon_generator.get_pattern_info()
+        print(f"Total possible combinations: {pattern_info['total_combinations']:,}")
+        print(f"Previously visited: {pattern_info['visited_count']}")
+        print(f"Remaining to test: {pattern_info['remaining_combinations']:,}")
         print("Press Ctrl+C to stop\n")
         
         try:
@@ -90,8 +97,15 @@ class JioMartCouponTester:
     def print_summary(self):
         """Print summary of tested coupons"""
         print(f"\nSummary:")
-        print(f"Total coupons tested: {len(self.tested_coupons)}")
+        print(f"Total coupons tested this session: {len(self.tested_coupons)}")
+        print(f"Total coupons visited overall: {self.coupon_generator.get_visited_count()}")
         print(f"Last coupon tested: {self.tested_coupons[-1] if self.tested_coupons else 'None'}")
+        
+        # Get pattern information
+        pattern_info = self.coupon_generator.get_pattern_info()
+        print(f"Pattern: {pattern_info['pattern']}")
+        print(f"Total possible combinations: {pattern_info['total_combinations']:,}")
+        print(f"Remaining combinations: {pattern_info['remaining_combinations']:,}")
         
         # Save tested coupons to file for reference
         if self.tested_coupons:
@@ -99,6 +113,7 @@ class JioMartCouponTester:
                 for coupon in self.tested_coupons:
                     f.write(f"{coupon}\n")
             print(f"Tested coupons saved to 'tested_coupons.txt'")
+            print(f"Visited coupons automatically saved to 'visited.txt'")
     
     def get_tested_coupons(self):
         """Return list of all tested coupons"""
