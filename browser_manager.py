@@ -29,6 +29,11 @@ class BrowserManager:
         options.set_preference('permissions.default.image', 2)  # Disable images
         options.set_preference('javascript.enabled', False)  # Disable JS for faster loading
         
+        # Marionette stability improvements
+        options.set_preference('marionette.enabled', True)
+        options.set_preference('marionette.port', 0)  # Use random port
+        options.set_preference('devtools.debugger.remote-enabled', True)
+        
         # Window configuration
         options.add_argument('--width=1920')
         options.add_argument('--height=1080')
