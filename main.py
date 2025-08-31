@@ -60,9 +60,6 @@ class JioMartCouponTester:
                 # Save to gotit.txt
                 self._save_successful_coupon(coupon_code, displayed_coupon)
             
-            # Keep browser focused for remaining time
-            time.sleep(Config.FOCUS_DURATION - 1)
-            
             # Close browser
             self.browser_manager.close_browser()
             
@@ -113,9 +110,6 @@ class JioMartCouponTester:
                 
                 # Test the coupon
                 self.test_coupon(coupon_code)
-                
-                # Brief pause between iterations to prevent overwhelming
-                time.sleep(0.5)
                 
         except KeyboardInterrupt:
             print("\nReceived keyboard interrupt. Stopping...")
