@@ -113,122 +113,24 @@ class CouponGenerator:
         return digits, letters
     
     def _generate_systematic_coupon(self):
-        """Generate coupon with same length/distribution but different systematic approach"""
-        # Analyze original pattern
-        digits, letters = self._analyze_base_pattern()
+        """Generate coupon with same character/digit count but random placement"""
+        # Count digits and letters in original pattern "881a0eb9570ae493b60b39e71eeaa03a"
+        original_digits = sum(1 for c in self.base_pattern if c.isdigit())  # 16 digits
+        original_letters = sum(1 for c in self.base_pattern if c.islower())  # 16 letters
         
-        # Create different systematic patterns
-        patterns = [
-            self._pattern_sequential(),
-            self._pattern_blocks(),
-            self._pattern_alternating(),
-            self._pattern_mirrored(),
-            self._pattern_fibonacci_like()
-        ]
+        # Generate random digits and letters
+        random_digits = [random.choice(string.digits) for _ in range(original_digits)]
+        random_letters = [random.choice(string.ascii_lowercase) for _ in range(original_letters)]
         
-        # Choose a random pattern approach
-        selected_pattern = random.choice(patterns)
-        return selected_pattern
+        # Create all characters list
+        all_chars = random_digits + random_letters
+        
+        # Shuffle to randomize placement
+        random.shuffle(all_chars)
+        
+        # Join to create 32-character coupon
+        return ''.join(all_chars)
     
-    def _pattern_sequential(self):
-        """Sequential incremental pattern"""
-        coupon = ['0'] * 32  # Start with 32 chars
-        
-        # Fill digit positions (same count as original)
-        digit_positions = [0, 1, 2, 4, 6, 8, 9, 13, 15, 16, 18, 20, 22, 25, 29, 30]
-        letter_positions = [3, 5, 7, 10, 11, 12, 14, 17, 19, 21, 23, 24, 26, 27, 28, 31]
-        
-        # Generate sequential digits
-        for i, pos in enumerate(digit_positions):
-            coupon[pos] = str(i % 10)
-        
-        # Generate sequential letters  
-        for i, pos in enumerate(letter_positions):
-            coupon[pos] = chr(ord('a') + (i % 26))
-        
-        return ''.join(coupon)
-    
-    def _pattern_blocks(self):
-        """Block-based pattern"""
-        coupon = ['0'] * 32
-        
-        # Create blocks of similar characters
-        digit_positions = [0, 1, 2, 4, 6, 8, 9, 13, 15, 16, 18, 20, 22, 25, 29, 30]
-        letter_positions = [3, 5, 7, 10, 11, 12, 14, 17, 19, 21, 23, 24, 26, 27, 28, 31]
-        
-        # Fill with block patterns
-        block_digits = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
-        block_letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p']
-        
-        for i, pos in enumerate(digit_positions):
-            coupon[pos] = block_digits[i % len(block_digits)]
-        
-        for i, pos in enumerate(letter_positions):
-            coupon[pos] = block_letters[i % len(block_letters)]
-        
-        return ''.join(coupon)
-    
-    def _pattern_alternating(self):
-        """Alternating high/low values"""
-        coupon = ['0'] * 32
-        
-        digit_positions = [0, 1, 2, 4, 6, 8, 9, 13, 15, 16, 18, 20, 22, 25, 29, 30]
-        letter_positions = [3, 5, 7, 10, 11, 12, 14, 17, 19, 21, 23, 24, 26, 27, 28, 31]
-        
-        # Alternate between high and low digits
-        for i, pos in enumerate(digit_positions):
-            coupon[pos] = '9' if i % 2 == 0 else '1'
-        
-        # Alternate between high and low letters
-        for i, pos in enumerate(letter_positions):
-            coupon[pos] = 'z' if i % 2 == 0 else 'a'
-        
-        return ''.join(coupon)
-    
-    def _pattern_mirrored(self):
-        """Mirror pattern around center"""
-        coupon = ['0'] * 32
-        
-        digit_positions = [0, 1, 2, 4, 6, 8, 9, 13, 15, 16, 18, 20, 22, 25, 29, 30]
-        letter_positions = [3, 5, 7, 10, 11, 12, 14, 17, 19, 21, 23, 24, 26, 27, 28, 31]
-        
-        # Create mirror patterns
-        mid = len(digit_positions) // 2
-        for i, pos in enumerate(digit_positions):
-            if i < mid:
-                coupon[pos] = str(i % 10)
-            else:
-                mirror_i = len(digit_positions) - 1 - i
-                coupon[pos] = str(mirror_i % 10)
-        
-        mid = len(letter_positions) // 2
-        for i, pos in enumerate(letter_positions):
-            if i < mid:
-                coupon[pos] = chr(ord('a') + (i % 26))
-            else:
-                mirror_i = len(letter_positions) - 1 - i
-                coupon[pos] = chr(ord('a') + (mirror_i % 26))
-        
-        return ''.join(coupon)
-    
-    def _pattern_fibonacci_like(self):
-        """Fibonacci-like progression"""
-        coupon = ['0'] * 32
-        
-        digit_positions = [0, 1, 2, 4, 6, 8, 9, 13, 15, 16, 18, 20, 22, 25, 29, 30]
-        letter_positions = [3, 5, 7, 10, 11, 12, 14, 17, 19, 21, 23, 24, 26, 27, 28, 31]
-        
-        # Fibonacci-like sequence for digits
-        fib_digits = [1, 1, 2, 3, 5, 8, 3, 1, 4, 5, 9, 4, 3, 7, 0, 7]
-        for i, pos in enumerate(digit_positions):
-            coupon[pos] = str(fib_digits[i % len(fib_digits)])
-        
-        # Letter progression
-        letter_prog = [0, 1, 1, 2, 3, 5, 8, 13, 21, 8, 3, 11, 14, 25, 13, 12]
-        for i, pos in enumerate(letter_positions):
-            coupon[pos] = chr(ord('a') + (letter_prog[i % len(letter_prog)] % 26))
-        
-        return ''.join(coupon)
     
     def get_generated_count(self):
         """Return count of generated coupons in this session"""
