@@ -108,10 +108,14 @@ class JioMartCouponTester:
                 self.tested_coupons.append(coupon_code)
                 self.total_tested += 1
                 
-                # Print progress every 50 tests
-                if self.total_tested % 50 == 0:
+                # Print result for each coupon
+                status = "✅ FOUND" if is_success else "❌ NOT FOUND"
+                print(f"Coupon {coupon_code}: {status} (Total tested: {self.total_tested})")
+                
+                # Print summary every 25 tests
+                if self.total_tested % 25 == 0:
                     success_count = len(self.successful_coupons)
-                    print(f"Progress: {self.total_tested} tested | {success_count} successful | Latest: {coupon_code}")
+                    print(f"📊 SUMMARY: {self.total_tested} tested | {success_count} successful | Success rate: {success_count/self.total_tested*100:.1f}%")
             
             return result
             
@@ -191,8 +195,9 @@ class JioMartCouponTester:
                         
                         try:
                             result = future.result()
+                            # Results are already printed in test_single_coupon
                             if result.get('success'):
-                                print(f"🎉 SUCCESS! Coupon {result['coupon']} shows offer page!")
+                                print(f"🎉 VALID COUPON FOUND! {result['coupon']} shows offer page!")
                         except Exception as e:
                             print(f"Thread error: {e}")
                     
