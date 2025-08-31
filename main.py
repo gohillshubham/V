@@ -41,8 +41,27 @@ class JioMartCouponTester:
             self.browser_manager.open_browser()
             self.browser_manager.navigate_to_url(url)
             
-            # Keep browser focused for 2 seconds
-            time.sleep(Config.FOCUS_DURATION)
+            # Wait a moment for page to fully load
+            time.sleep(1)
+            
+            # Check if this is a success screen
+            is_success = self.browser_manager.check_for_success_screen()
+            
+            if is_success:
+                print(f"🎉 SUCCESS! Coupon {coupon_code} shows offer page!")
+                
+                # Take screenshot of success
+                screenshot_filename = f"success_{coupon_code}.png"
+                self.browser_manager.take_screenshot(screenshot_filename)
+                
+                # Extract the displayed coupon from the page
+                displayed_coupon = self.browser_manager.extract_coupon_from_page()
+                
+                # Save to gotit.txt
+                self._save_successful_coupon(coupon_code, displayed_coupon)
+            
+            # Keep browser focused for remaining time
+            time.sleep(Config.FOCUS_DURATION - 1)
             
             # Close browser
             self.browser_manager.close_browser()
@@ -50,12 +69,25 @@ class JioMartCouponTester:
             # Store the tested coupon
             self.tested_coupons.append(coupon_code)
             
-            print(f"Completed testing coupon: {coupon_code} (Total tested: {len(self.tested_coupons)})")
+            status = "SUCCESS ✅" if is_success else "No offer"
+            print(f"Completed testing coupon: {coupon_code} ({status}) (Total tested: {len(self.tested_coupons)})")
             
         except Exception as e:
             print(f"Error testing coupon {coupon_code}: {str(e)}")
             # Ensure browser is closed even on error
             self.browser_manager.close_browser()
+    
+    def _save_successful_coupon(self, test_coupon, displayed_coupon):
+        """Save successful coupon to gotit.txt"""
+        try:
+            with open('gotit.txt', 'a') as f:
+                timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
+                if displayed_coupon:
+                    f.write(f"{timestamp} | Test: {test_coupon} | Displayed: {displayed_coupon}\n")
+                else:
+                    f.write(f"{timestamp} | Test: {test_coupon} | Displayed: Not extracted\n")
+        except Exception as e:
+            print(f"Error saving successful coupon: {e}")
     
     def run(self):
         """Main execution loop"""
@@ -114,6 +146,7 @@ class JioMartCouponTester:
                     f.write(f"{coupon}\n")
             print(f"Tested coupons saved to 'tested_coupons.txt'")
             print(f"Visited coupons automatically saved to 'visited.txt'")
+            print(f"Successful coupons (if any) saved to 'gotit.txt'")
     
     def get_tested_coupons(self):
         """Return list of all tested coupons"""

@@ -167,6 +167,56 @@ class BrowserManager:
             print(f"Error taking screenshot: {e}")
             return False
     
+    def check_for_success_screen(self):
+        """Check if the current page shows the coupon success screen"""
+        if self.driver is None:
+            return False
+        
+        try:
+            # Check for specific text elements that indicate success
+            success_indicators = [
+                "Use Coupon Code given below",
+                "Flat Rs. 100 Off",
+                "Copy Code",
+                "Start shopping on JioMart"
+            ]
+            
+            page_source = self.driver.page_source.lower()
+            
+            # Check if at least 2 success indicators are present
+            found_indicators = 0
+            for indicator in success_indicators:
+                if indicator.lower() in page_source:
+                    found_indicators += 1
+            
+            return found_indicators >= 2
+            
+        except Exception as e:
+            print(f"Error checking for success screen: {e}")
+            return False
+    
+    def extract_coupon_from_page(self):
+        """Extract coupon code from the success page"""
+        if self.driver is None:
+            return None
+        
+        try:
+            # Look for the coupon code element - it's usually in a specific format
+            # Based on the screenshot, it appears in a box/container
+            potential_elements = self.driver.find_elements(By.XPATH, "//div[contains(@class, 'coupon') or contains(text(), 'Copy Code')]/../*")
+            
+            for element in potential_elements:
+                text = element.text.strip()
+                # Coupon codes are typically alphanumeric and of certain length
+                if text and len(text) >= 8 and len(text) <= 15 and text.replace(' ', '').isalnum():
+                    return text.replace(' ', '').upper()
+            
+            return None
+            
+        except Exception as e:
+            print(f"Error extracting coupon from page: {e}")
+            return None
+    
     def wait_for_element(self, by, value, timeout=10):
         """Wait for element to be present"""
         if self.driver is None:
